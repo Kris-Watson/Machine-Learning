@@ -265,15 +265,15 @@ plot_stuff(loss_list,accuracy_list)
 # model.load_state_dict(torch.load( "models/hotdog_model.pt"))
 # model.eval()
 
-# Predict your image(s):
-model.eval()
-myPath = "1.jpg" # Use the file path for your image
-myImage = Image.open(myPath)
-if not myImage.mode == 'RGB':
-	myImage = myImage.convert('RGB')
-myImage = composed(myImage).to(device)
+# # Predict your image(s):
+# model.eval()
+# myPath = "1.jpg" # Use the file path for your image
+# myImage = Image.open(myPath)
+# if not myImage.mode == 'RGB':
+# 	myImage = myImage.convert('RGB')
+# myImage = composed(myImage).to(device)
 
-# Get prediction
-z = model(myImage.unsqueeze(0))
-# Print label with highest probability
-print(torch.max(z.data, 1))
+# # Get prediction
+# z = model(myImage.unsqueeze(0))
+# # Print label with highest probability
+# print(torch.max(z.data, 1))

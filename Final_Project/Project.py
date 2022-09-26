@@ -248,7 +248,7 @@ elapsed_time = t1_stop - t1_start
 print("elapsed time", elapsed_time, "s")
 
 # Save the model to model.pt
-torch.save(model.state_dict(), 'hotdog_model.pt')
+torch.save(model.state_dict(), 'trained_model.pt')
 
 # Plot loss and accuracy for each iteration
 plot_stuff(loss_list,accuracy_list)
@@ -260,20 +260,33 @@ plot_stuff(loss_list,accuracy_list)
 # Load the model by creating a new resnet18 model then loading the params..
 # (w and b) from our pt file in models folder
 """
-# model = models.resnet18(pretrained=True)
-# model.fc = nn.Linear(512, n_classes)
-# model.load_state_dict(torch.load( "models/hotdog_model.pt"))
-# model.eval()
-
-# Predict your image(s):
+n_classes = 2
+model = models.resnet18(pretrained=True)
+model.fc = nn.Linear(512, n_classes)
+model.load_state_dict(torch.load( "trained_model.pt"))
+model = model.to(device)
 model.eval()
-myPath = "1.jpg" # Use the file path for your image
-myImage = Image.open(myPath)
-if not myImage.mode == 'RGB':
-	myImage = myImage.convert('RGB')
-myImage = composed(myImage).to(device)
 
-# Get prediction
-z = model(myImage.unsqueeze(0))
-# Print label with highest probability
-print(torch.max(z.data, 1))
+# Collect all images from myImages folder
+myData = []
+for filename in os.listdir('myImages'):
+	img_path = f'myImages/{filename}'
+	image = Image.open(img_path)
+	if not image.mode == 'RGB':
+		image = image.convert('RGB')
+	# Set hotdog to label 1 and not_hotdog to label 0
+	myImage = composed(image).to(device)
+	myData.append([myImage, filename])
+
+
+for img, path in myData:
+	# Get prediction
+	z = model(img.unsqueeze(0))
+	# Print label with highest probability
+	myProb, myLabel = torch.max(z.data, 1)
+
+	if myLabel.item() == 1:
+		myLabel = "has a stop sign"
+	elif myLabel.item() == 0:
+		myLabel = "does not have a stop sign"
+	print(f'{path} {myLabel}, with a probability of {myProb.item()}')
